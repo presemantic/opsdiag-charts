@@ -18,11 +18,21 @@ permissions:
 env:
   REGION: europe-west1
   GAR_LOCATION: europe-west1-docker.pkg.dev/prod-common-cicd/opsdiag-helm-pub
-  CHART_PATH: opsdiag-app-connector
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        chart:
+          - opsdiag-app-api
+          - opsdiag-app-agent
+          - opsdiag-app-connector
+          - opsdiag-app-front
+          - opsdiag-app-mcp-proxy
+          - opsdiag-app-mcp-server
+          - opsdiag-app-sched
     steps:
       - name: "[Checkout] Build"
         uses: actions/checkout@v4
@@ -90,17 +100,17 @@ jobs:
 
       - name: "[Helm] Dependency update"
         run: |
-          helm dependency update "build/${CHART_PATH}"
+          helm dependency update "build/${{ matrix.chart }}"
 
       - name: "[Helm] Lint"
         run: |
-          helm lint "build/${CHART_PATH}"
+          helm lint "build/${{ matrix.chart }}"
 
       - name: "[Helm] Package"
         run: |
           mkdir -p dist
-          helm package "build/${CHART_PATH}" --destination dist
+          helm package "build/${{ matrix.chart }}" --destination dist
 
       - name: "[Helm] Push"
         run: |
-          helm push dist/*.tgz "oci://${GAR_LOCATION}"
+          helm push dist/${{ matrix.chart }}-*.tgz "oci://${GAR_LOCATION}"

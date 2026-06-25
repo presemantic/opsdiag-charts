@@ -1,0 +1,13 @@
+apiVersion: v2
+name: opsdiag-app-api
+description: OpsDiag app API
+type: application
+version: 0.1.0
+appVersion: "2026-06-25.02-55-23.5c8a48"
+home: https://opsdiag.ai
+sources:
+  - https://github.com/presemantic/opsdiag-app-api
+dependencies:
+  - name: common
+    repository: https://opsolving.github.io/charts/
+    version: 2.x.x
